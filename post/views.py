@@ -44,8 +44,6 @@ class PostViewSet(ModelViewSet):
     search_fields = ['tags__slug', 'created_at']
     ordering_fields = ['created_at', 'title']
 
-    # def perform_create(self, serializer):
-    #     serializer.save()
     def get_serializer_class(self):
         if self.action == 'list':
             return PostListSerializer
