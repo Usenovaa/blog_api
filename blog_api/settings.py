@@ -20,14 +20,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'secret key'
+SECRET_KEY = 'django-insecure-$(*8+687-^bg5w4yi9p7f@^m-%**$=b069tdi0w)%tp9edjs1%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = 'True/False'
-
+DEBUG = True
+AUTH_USER_MODEL = 'account.User'
 ALLOWED_HOSTS = []
 
-AUTH_USER_MODEL = 'account.User'
 
 # Application definition
 
@@ -41,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'rest_framework.authtoken',
+    'drf_yasg',
     # apps
     'post',
     'account',
@@ -84,9 +84,9 @@ WSGI_APPLICATION = 'blog_api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'db',
-        'USER': 'user',
-        'PASSWORD': 'password',
+        'NAME': 'blog_api',
+        'USER': 'hello',
+        'PASSWORD': '1',
         'HOST': 'localhost',
         'PORT': 5432
     }
@@ -142,4 +142,11 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 2,
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'usenovatest@gmail.com'
+EMAIL_HOST_PASSWORD = 'cawpiwxyuejzbthc'
 

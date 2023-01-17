@@ -2,11 +2,11 @@ from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from rest_framework.viewsets import ModelViewSet
-
-from .models import Category, Tag, Post
-from .permission import IsAdminAuthPermission
+from .models import Category, Tag, Post, Comment
+from .permission import IsAdminAuthPermission,\
+    IsAuthorPermission
 from .serializers import CategorySerializer, \
-    TagSerializer, PostSerializer, PostListSerializer
+    TagSerializer, PostSerializer, PostListSerializer, CommentSerializer
 import django_filters
 from rest_framework import filters
 
@@ -44,6 +44,8 @@ class PostViewSet(ModelViewSet):
     search_fields = ['tags__slug', 'created_at']
     ordering_fields = ['created_at', 'title']
 
+    # def perform_create(self, serializer):
+    #     serializer.save()
     def get_serializer_class(self):
         if self.action == 'list':
             return PostListSerializer
@@ -55,12 +57,25 @@ class PostViewSet(ModelViewSet):
         elif self.action == 'create':
             self.permission_classes = [
                 IsAdminAuthPermission]
-        elif self.action == ['update',
+        elif self.action in ['update',
                     'partial_update', 'destroy']:
-            pass
+            self.permission_classes = [IsAuthorPermission]
+
         return super().get_permissions()
 
 
+class CommentView(ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
 
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            self.permission_classes = [AllowAny]
+        elif self.action == 'create':
+            self.permission_classes = [
+                IsAdminAuthPermission]
+        elif self.action in ['update',
+                    'partial_update', 'destroy']:
+            self.permission_classes = [IsAuthorPermission]
 
-
+        return super().get_permissions()

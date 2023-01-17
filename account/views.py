@@ -3,7 +3,7 @@ from rest_framework.authtoken.views \
     import ObtainAuthToken
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from drf_yasg.utils import swagger_auto_schema
 from .permissions import IsActivePermission
 from .serializers import RegistrationSerializer, \
     LoginSerializer, ActivationSerializer, \
@@ -14,6 +14,7 @@ from rest_framework.permissions import IsAuthenticated
 
 
 class RegistrationView(APIView):
+    @swagger_auto_schema(request_body=RegistrationSerializer())
     def post(self, request):
         serializer = RegistrationSerializer(
             data=request.data
@@ -25,6 +26,7 @@ class RegistrationView(APIView):
 
 
 class ActivationView(APIView):
+    @swagger_auto_schema(request_body=ActivationSerializer())
     def post(self, request):
         serializer = ActivationSerializer(
             data=request.data)
@@ -52,6 +54,7 @@ class LogoutView(APIView):
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(request_body=ChangePasswordSerializer())
     def post(self, request):
         serializer = ChangePasswordSerializer(
             data=request.data,
@@ -65,6 +68,7 @@ class ChangePasswordView(APIView):
 
 
 class ForgotPasswordView(APIView):
+    @swagger_auto_schema(request_body=ForgotPasswordSerializer())
     def post(self, request):
         serializer = ForgotPasswordSerializer(
             data = request.data
@@ -77,6 +81,7 @@ class ForgotPasswordView(APIView):
 
 
 class ForgotPasswordCompleteView(APIView):
+    @swagger_auto_schema(request_body=ForgotPasswordCompleteSerializer())
     def post(self, request):
         serializer = ForgotPasswordCompleteSerializer(
             data=request.data)
