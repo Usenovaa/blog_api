@@ -1,14 +1,18 @@
 from django.shortcuts import render
+from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from rest_framework.viewsets import ModelViewSet
-from .models import Category, Tag, Post, Comment
+from .models import Category, Tag, Post, \
+    Comment, Like
 from .permission import IsAdminAuthPermission,\
     IsAuthorPermission
 from .serializers import CategorySerializer, \
-    TagSerializer, PostSerializer, PostListSerializer, CommentSerializer
+    TagSerializer, PostSerializer, PostListSerializer,\
+    CommentSerializer, RatingSerializer
 import django_filters
 from rest_framework import filters
+from rest_framework.decorators import action
 
 
 class CategoryListView(
@@ -43,6 +47,47 @@ class PostViewSet(ModelViewSet):
     filterset_fields = ['category']
     search_fields = ['tags__slug', 'created_at']
     ordering_fields = ['created_at', 'title']
+
+    # api/v1/posts/pk(post1)/comments/
+    @action(['GET'], detail=True)
+    def comments(self, request, pk=None):
+        post = self.get_object()
+        comments = post.comments.all()
+        serializer = CommentSerializer(
+            comments, many=True)
+        return Response(serializer.data)
+
+    @action(['POST', 'PATCH'], detail=True)
+    def rating(self, request, pk=None):
+        data = request.data.copy()
+        data['post'] = pk
+        serializer = RatingSerializer(
+            data=data, context={'request': request}
+        )
+        if serializer.is_valid(raise_exception=True):
+            serializer.create(
+                serializer.validated_data)
+            return Response('Created')
+
+    @action(['POST'], detail=True)
+    def like(self, request, pk=None):
+        post = self.get_object()
+        user = request.user
+        try:
+            like = Like.objects.get(
+                post=post, author=user)
+            like.is_liked = not like.is_liked
+            like.save()
+            message = 'liked' if like.is_liked else 'disliked'
+            if not like.is_liked:
+                like.delete()
+        except Like.DoesNotExist:
+            Like.objects.create(
+                post=post, author=user,
+                is_liked=True)
+            message = 'liked'
+        return Response(message, status=200)
+
 
     def get_serializer_class(self):
         if self.action == 'list':
