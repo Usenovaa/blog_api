@@ -4,7 +4,7 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from rest_framework.viewsets import ModelViewSet
 from .models import Category, Tag, Post, \
-    Comment, Like
+    Comment, Like, Rating
 from .permission import IsAdminAuthPermission,\
     IsAuthorPermission
 from .serializers import CategorySerializer, \
@@ -64,10 +64,21 @@ class PostViewSet(ModelViewSet):
         serializer = RatingSerializer(
             data=data, context={'request': request}
         )
+        rating = Rating.objects.filter(
+            author=request.user,
+            post=pk
+        ).first()
         if serializer.is_valid(raise_exception=True):
-            serializer.create(
-                serializer.validated_data)
-            return Response('Created')
+            if rating and request.method == 'POST':
+                return Response('use PATCH method')
+            elif rating and request.method == 'PATCH':
+                serializer.update(rating,
+                        serializer.validated_data)
+                return Response('Updated')
+            elif request.method == 'POST':
+                serializer.create(
+                    serializer.validated_data)
+                return Response('Created')
 
     @action(['POST'], detail=True)
     def like(self, request, pk=None):

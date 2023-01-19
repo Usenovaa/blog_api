@@ -43,10 +43,10 @@ class Post(models.Model):
             related_name='posts')
     title = models.CharField(max_length=30)
     body = models.TextField()
-    image = models.ImageField(upload_to='posts/')
+    image = models.ImageField(upload_to='posts/', blank=True)
     slug = models.SlugField(max_length=30,
         primary_key=True, blank=True)
-    tags = models.ManyToManyField(Tag)
+    tags = models.ManyToManyField(Tag, blank=True)
     category = models.ForeignKey(Category,
          on_delete=models.CASCADE,
         related_name='posts')
