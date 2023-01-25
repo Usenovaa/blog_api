@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from slugify import slugify
 
+from django.db.models import Q
+
 User = get_user_model()
 
 
@@ -20,6 +22,10 @@ class Category(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)
         super().save()
+    
+    class Meta:
+        verbose_name = 'Category'
+        verbose_name_plural = 'Categories'
 
 
 class Tag(models.Model):
@@ -63,9 +69,15 @@ class Post(models.Model):
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
 
+    @property
+    def avg_rating(self):
+        from django.db.models import Avg
+        result = self.ratings.aggregate(Avg('rating'))
+        return result['rating__avg']
+
     class Meta:
         ordering = ['-created_at']
-
+        
 
 class Comment(models.Model):
     body = models.CharField(max_length=30)

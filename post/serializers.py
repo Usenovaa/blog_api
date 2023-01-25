@@ -113,5 +113,3 @@ class RatingSerializer(serializers.ModelSerializer):
                 'Рейтинг должен быть от 1 до 5'
             )
         return rating
-
-
